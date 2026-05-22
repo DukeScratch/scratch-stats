@@ -64,6 +64,88 @@ function setupEventListeners() {
     document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.addEventListener('click', switchTab);
     });
+
+    // Search functionality
+    const searchBtn = document.getElementById('searchBtn');
+    const searchInput = document.getElementById('searchInput');
+
+    searchBtn.addEventListener('click', performSearch);
+    searchInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            performSearch();
+        }
+    });
+}
+
+// Perform search
+async function performSearch() {
+    const query = document.getElementById('searchInput').value.trim();
+    
+    if (!query) {
+        alert('Please enter a search term');
+        return;
+    }
+
+    const searchResults = document.getElementById('searchResults');
+    searchResults.innerHTML = '<p class="loading">Searching...</p>';
+    document.getElementById('searchModal').style.display = 'block';
+
+    try {
+        // Search for projects
+        const projectsResponse = await fetch(`https://api.scratch.mit.edu/search/projects?q=${encodeURIComponent(query)}&limit=5`);
+        const projectsData = await projectsResponse.json();
+
+        // Search for users
+        const usersResponse = await fetch(`https://api.scratch.mit.edu/search/users?q=${encodeURIComponent(query)}&limit=5`);
+        const usersData = await usersResponse.json();
+
+        let html = '';
+
+        // Display projects
+        if (projectsData && projectsData.length > 0) {
+            html += '<h3>Projects</h3><div class="search-results-list">';
+            projectsData.forEach(project => {
+                html += `
+                    <div class="search-result-item">
+                        <h4>${project.title}</h4>
+                        <p>By <strong>@${project.creator.username}</strong></p>
+                        <p>❤️ ${project.stats.favorites} | 💬 ${project.stats.comments}</p>
+                        <a href="https://scratch.mit.edu/projects/${project.id}/" target="_blank" class="result-link">View Project →</a>
+                    </div>
+                `;
+            });
+            html += '</div>';
+        }
+
+        // Display users
+        if (usersData && usersData.length > 0) {
+            html += '<h3>Users</h3><div class="search-results-list">';
+            usersData.forEach(user => {
+                html += `
+                    <div class="search-result-item">
+                        <h4>@${user.username}</h4>
+                        <p>ID: ${user.id}</p>
+                        <a href="https://scratch.mit.edu/users/${user.username}/" target="_blank" class="result-link">View Profile →</a>
+                    </div>
+                `;
+            });
+            html += '</div>';
+        }
+
+        if (!projectsData || projectsData.length === 0 && (!usersData || usersData.length === 0)) {
+            html = '<p class="no-results">No results found for "' + query + '"</p>';
+        }
+
+        searchResults.innerHTML = html;
+    } catch (error) {
+        console.error('Search error:', error);
+        searchResults.innerHTML = '<p class="error">Error performing search. Please try again.</p>';
+    }
+}
+
+// Close search modal
+function closeSearchModal() {
+    document.getElementById('searchModal').style.display = 'none';
 }
 
 // Handle login
