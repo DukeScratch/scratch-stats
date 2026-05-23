@@ -233,22 +233,22 @@ async function loadPublicStats() {
     }
 }
 
-// Load featured content
+// Load featured content with clickable links
 function loadFeaturedContent() {
     const projectsDiv = document.getElementById('featuredProjects');
     const studiosDiv = document.getElementById('featuredStudios');
     const usersDiv = document.getElementById('featuredUsers');
 
     projectsDiv.innerHTML = appData.featuredProjects.map(p => 
-        `<div class="featured-item"><strong>${p.title}</strong><p>ID: ${p.id}</p></div>`
+        `<a href="https://scratch.mit.edu/projects/${p.id}/" target="_blank" class="featured-item featured-link"><strong>${p.title}</strong><p>ID: ${p.id}</p></a>`
     ).join('') || '<p style="color:#999;">No featured projects yet</p>';
 
     studiosDiv.innerHTML = appData.featuredStudios.map(s => 
-        `<div class="featured-item"><strong>${s.title}</strong><p>ID: ${s.id}</p></div>`
+        `<a href="https://scratch.mit.edu/studios/${s.id}/" target="_blank" class="featured-item featured-link"><strong>${s.title}</strong><p>ID: ${s.id}</p></a>`
     ).join('') || '<p style="color:#999;">No featured studios yet</p>';
 
     usersDiv.innerHTML = appData.featuredUsers.map(u => 
-        `<div class="featured-item"><strong>@${u.username}</strong><p>✓ Verified</p></div>`
+        `<a href="https://scratch.mit.edu/users/${u.username}/" target="_blank" class="featured-item featured-link"><strong>@${u.username}</strong><p>✓ Verified</p></a>`
     ).join('') || '<p style="color:#999;">No featured users yet</p>';
 }
 
